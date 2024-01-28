@@ -4,7 +4,11 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/userModel');
-const authRouter = require('./routes/auth')
+const QuizQuestion = require('./models/quizModel');
+const authRouter = require('./routes/auth');
+const quizRouter = require('./routes/quizzes')
+const authHandler = require('./middlewares/authHandler');
+
 dotenv.config();
 
 const PORT = process.env.PORT || 4000;
@@ -16,6 +20,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 
 app.use('/',authRouter);
+// app.use('/',authHandler);
+app.use('/',quizRouter)
 
 app.get('/',(req,res)=>{
     res.send('hello this is the default route for quizzie')
@@ -43,6 +49,10 @@ app.get('/users', async (req,res)=>{
             message: 'something went wrong',
         })
     }
+})
+app.get('/current-user', authHandler ,(req,res)=>{
+    const currentUser = req.user;
+    res.status(200).json({message:'current user', user: currentUser});
 })
 
 //error-handler
